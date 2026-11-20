@@ -38,8 +38,9 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     composable("restaurant/{id}") { backStack ->
-                        val id = backStack.arguments?.getString("id") ?: ""
+                        val id = backStack.arguments?.getString("id")?.toIntOrNull() ?: 1
                         RestaurantMenuScreen(
+                            restaurantId = id,
                             onBack = { navController.popBackStack() },
                             onMealClick = { mealId ->
                                 navController.navigate("item/$mealId")

@@ -17,12 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.kool.customer.ui.theme.*
 
 data class ExtraItem(
@@ -37,6 +39,7 @@ data class ExtraItem(
 // Figma: hero photo, meal info, quantity stepper, extras grid, notes field, add-to-basket CTA
 @Composable
 fun ItemDetailScreen(
+    heroImageUrl: String? = null,
     onBack: () -> Unit = {},
     onAddToCart: () -> Unit = {},
 ) {
@@ -61,16 +64,24 @@ fun ItemDetailScreen(
                         .fillMaxWidth()
                         .height(272.dp),
                 ) {
-                    // TODO: replace with real meal hero photo from restaurant API
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(Color(0xFFE8A87C), Color(0xFFD4583A), Color(0xFF8B2500))
-                                )
-                            ),
-                    )
+                    if (heroImageUrl != null) {
+                        AsyncImage(
+                            model = heroImageUrl,
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(Color(0xFFE8A87C), Color(0xFFD4583A), Color(0xFF8B2500))
+                                    )
+                                ),
+                        )
+                    }
                     // Controls
                     Row(
                         modifier = Modifier
