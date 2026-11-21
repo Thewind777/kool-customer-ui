@@ -6,12 +6,14 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.kool.customer.R
 
-// Almarai is downloaded at runtime via downloadable fonts or bundled.
-// Fallback to system default (sans-serif) for now; replace Font() calls with
-// actual bundled .ttf resources once assets are available.
-val AlmaraiFamily = FontFamily.Default
-val InterFamily = FontFamily.Default
+// Almarai — the typeface used by the Figma file (Regular / Bold / ExtraBold).
+val AlmaraiFamily = FontFamily(
+    Font(R.font.almarai_regular, FontWeight.Normal),
+    Font(R.font.almarai_bold, FontWeight.Bold),
+    Font(R.font.almarai_extrabold, FontWeight.ExtraBold),
+)
 
 val KoolTypography = Typography(
     displayLarge = TextStyle(
@@ -35,7 +37,7 @@ val KoolTypography = Typography(
         fontSize = 14.sp,
     ),
     titleLarge = TextStyle(
-        fontFamily = InterFamily,
+        fontFamily = AlmaraiFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 21.sp,
     ),

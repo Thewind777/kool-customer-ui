@@ -1,5 +1,6 @@
 package com.kool.customer.data.repository
 
+import android.util.Log
 import com.kool.customer.data.api.KoolApiClient
 import com.kool.customer.data.model.RestaurantData
 import com.kool.customer.data.model.StoreDetailsResponse
@@ -9,8 +10,9 @@ object KoolRepository {
 
     suspend fun getRestaurants(): List<RestaurantData> {
         return try {
-            api.loadAvailableRestaurants().data ?: emptyList()
+            api.loadAvailableRestaurants().stores ?: emptyList()
         } catch (e: Exception) {
+            Log.w("KoolRepository", "loadAvailableRestaurants failed", e)
             emptyList()
         }
     }
@@ -19,6 +21,7 @@ object KoolRepository {
         return try {
             api.getStoreDetails(companyId = companyId)
         } catch (e: Exception) {
+            Log.w("KoolRepository", "getStoreDetails($companyId) failed", e)
             null
         }
     }

@@ -3,190 +3,91 @@ package com.kool.customer.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.kool.customer.ui.theme.*
+import com.kool.customer.R
+import com.kool.customer.ui.theme.Art
+import com.kool.customer.ui.theme.DesignCanvas
+import com.kool.customer.ui.theme.KoolDarkBg
+import com.kool.customer.ui.theme.KoolPageDotActive
+import com.kool.customer.ui.theme.KoolPageDotInactive
+import com.kool.customer.ui.theme.Label
+import com.kool.customer.ui.theme.Slab
+import com.kool.customer.ui.theme.at
 
-// Screen 01 · Welcome
-// Figma: dark gradient bg, Kool branding, Arabic headline, page dots, CTA + login link
+// Screen 01 · Welcome — Figma frame 2:4 (292 × 672). Coordinates are the frame's own px.
 @Composable
 fun WelcomeScreen(
     onStart: () -> Unit,
     onLogin: () -> Unit,
 ) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+    DesignCanvas(designWidth = 292.dp, designHeight = 672.dp, background = KoolDarkBg) {
         Box(
-            modifier = Modifier
+            Modifier
                 .fillMaxSize()
+                .background(Brush.verticalGradient(listOf(Color(0xFF11191C), Color(0xFF14171A)))),
+        )
+
+        // Decorative artwork, exactly where the design places it
+        Art(R.drawable.welcome_coral_left, 0f, 88f, 66f, 145f)
+        Art(R.drawable.welcome_coral_right, 241f, 182f, 51f, 115f)
+        Art(R.drawable.welcome_peppers, 0f, 254f, 69f, 135f)
+        Art(R.drawable.welcome_garnish, 268f, 302f, 24f, 91f)
+        Art(R.drawable.welcome_food_art, 0f, 386f, 292f, 184f)
+
+        // Brand artwork (K mark + كول Koool + Rate. & Order.)
+        Art(R.drawable.kool_brand_artwork, 86f, 59f, 117f, 190f)
+
+        // Headline
+        Label("أكل أحلى", 68f, 260f, 190f, 45f, 33f, Color.White, FontWeight.ExtraBold)
+        Label("تجربة أجمل", 62f, 299f, 198f, 45f, 32f, Color(0xFFF44981), FontWeight.ExtraBold)
+        Label("اطلب من أفضل المطاعم", 78f, 344f, 175f, 21f, 12f, Color.White.copy(alpha = 0.92f))
+        Label("وقيم تجربتك على كول", 78f, 365f, 175f, 20f, 12f, Color.White.copy(alpha = 0.92f))
+
+        // Skip pill
+        Box(
+            Modifier
+                .at(215f, 38f, 65f, 30f)
+                .clip(RoundedCornerShape(15.dp))
+                .border(0.6.dp, Color(0xFF697277), RoundedCornerShape(15.dp))
+                .clickable { onStart() },
+        )
+        Label("تخطي", 220f, 42f, 40f, 20f, 11f, Color.White)
+        Art(R.drawable.welcome_skip_arrow, 258f, 46f, 15f, 14f)
+
+        // Page indicator
+        Slab(118f, 570f, 8f, 8f, KoolPageDotActive, 4f)
+        Slab(130f, 570f, 8f, 8f, KoolPageDotInactive, 4f)
+        Slab(142f, 570f, 8f, 8f, KoolPageDotInactive, 4f)
+        Slab(154f, 570f, 8f, 8f, KoolPageDotInactive, 4f)
+
+        // Start CTA
+        Box(
+            Modifier
+                .at(22f, 592f, 245f, 45f)
+                .clip(RoundedCornerShape(24.dp))
                 .background(
-                    Brush.verticalGradient(listOf(KoolDarkBg, KoolDarkSurface))
+                    Brush.horizontalGradient(
+                        0f to Color(0xFFFF967A),
+                        0.55f to Color(0xFFFA4388),
+                        1f to Color(0xFFFF7C75),
+                    ),
                 )
-        ) {
-            // Skip button top-right
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 48.dp, end = 16.dp)
-                    .border(0.6.dp, Color(0xFF697277), RoundedCornerShape(15.dp))
-                    .clip(RoundedCornerShape(15.dp))
-                    .clickable { onStart() }
-                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "تخطي",
-                        color = Color.White,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Normal,
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(14.dp),
-                    )
-                }
-            }
+                .clickable { onStart() },
+        )
+        Label("ابدأ الآن", 75f, 601f, 136f, 27f, 16f, Color.White, FontWeight.Bold)
+        Art(R.drawable.welcome_cta_arrow, 231f, 604f, 19f, 19f)
 
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Spacer(Modifier.weight(1f))
-
-                // Brand logo placeholder
-                // TODO: replace with real Kool logo asset
-                Box(
-                    modifier = Modifier
-                        .size(117.dp, 190.dp)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(KoolPink.copy(alpha = 0.3f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text("K", color = KoolPink, fontSize = 64.sp, fontWeight = FontWeight.ExtraBold)
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                // Headline
-                Text(
-                    text = "أكل أحلى",
-                    color = Color.White,
-                    fontSize = 33.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = "تجربة أجمل",
-                    color = KoolPinkAccent,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.height(12.dp))
-
-                Text(
-                    text = "اطلب من أفضل المطاعم",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                )
-                Text(
-                    text = "وقيم تجربتك على كول",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                // Page indicator dots
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.padding(bottom = 24.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(KoolPageDotActive),
-                    )
-                    repeat(3) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(KoolPageDotInactive),
-                        )
-                    }
-                }
-
-                // Start CTA button
-                Box(
-                    modifier = Modifier
-                        .padding(horizontal = 22.dp)
-                        .fillMaxWidth()
-                        .height(45.dp)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(KoolOrangeGradientStart, KoolGradientStart, KoolOrangeGradientEnd)
-                            )
-                        )
-                        .clickable { onStart() },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "ابدأ الآن",
-                            color = Color.White,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(19.dp),
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                // Login link
-                Text(
-                    text = "تسجيل الدخول",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 11.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.clickable { onLogin() },
-                )
-
-                Spacer(Modifier.height(32.dp))
-            }
-        }
+        // Login link
+        Box(Modifier.at(70f, 646f, 150f, 17f).clickable { onLogin() })
+        Label("تسجيل الدخول", 70f, 646f, 150f, 17f, 11f, Color.White.copy(alpha = 0.88f))
     }
 }

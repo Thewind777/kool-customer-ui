@@ -12,8 +12,8 @@ android {
         applicationId = "com.kool.customer"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
     }
 
     kotlin {
@@ -24,6 +24,9 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // QA builds are signed with the debug key so they can be sideloaded directly.
+            // Replace with a real release keystore before publishing to a store.
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 

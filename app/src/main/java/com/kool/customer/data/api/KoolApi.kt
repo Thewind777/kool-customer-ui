@@ -14,12 +14,11 @@ interface KoolApi {
         @Field("PassengerLat") lat: Double = 32.9,
         @Field("PassengerLon") lon: Double = 13.18,
         @Field("iUserId") userId: Int = 0,
-        @Field("cuisineId") cuisineId: Int = 0,
-        @Field("iCategoryId") categoryId: Int = 0,
         @Field("vAddress") address: String = "طرابلس",
         @Field("vLang") lang: String = "ar",
         @Field("UserType") userType: String = "Customer",
         @Field("page") page: Int = 1,
+        @Field("eSystem") system: String = "DeliverAll",
     ): RestaurantsResponse
 
     @FormUrlEncoded

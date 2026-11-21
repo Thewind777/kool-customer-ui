@@ -2,347 +2,152 @@ package com.kool.customer.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import com.kool.customer.R
 import com.kool.customer.data.model.RestaurantData
-import com.kool.customer.ui.theme.*
+import com.kool.customer.ui.theme.Art
+import com.kool.customer.ui.theme.DesignCanvas
+import com.kool.customer.ui.theme.KoolBackground
+import com.kool.customer.ui.theme.KoolInfoChipBg
+import com.kool.customer.ui.theme.KoolPink
+import com.kool.customer.ui.theme.KoolSearchBg
+import com.kool.customer.ui.theme.KoolTextPrimary
+import com.kool.customer.ui.theme.KoolTextSecondary
+import com.kool.customer.ui.theme.Label
+import com.kool.customer.ui.theme.Photo
+import com.kool.customer.ui.theme.Slab
+import com.kool.customer.ui.theme.at
 import com.kool.customer.ui.viewmodel.DiscoverViewModel
 
-data class CategoryItem(val label: String, val isActive: Boolean = false)
-
-// Screen 02 · Discover
+// Screen 02 · Discover — Figma frame 2:7 (295 × 672).
+// Restaurant photos are live; every other pixel follows the design.
 @Composable
 fun DiscoverScreen(
     onRestaurantClick: (String) -> Unit = {},
     vm: DiscoverViewModel = viewModel(),
 ) {
-    val apiRestaurants by vm.restaurants.collectAsStateWithLifecycle()
+    val restaurants by vm.restaurants.collectAsStateWithLifecycle()
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        val categories = listOf(
-            CategoryItem("برجر", isActive = true),
-            CategoryItem("بيتزا"),
-            CategoryItem("دجاج"),
-            CategoryItem("مأكولات بحرية"),
-            CategoryItem("المزيد"),
-        )
+    DesignCanvas(designWidth = 295.dp, designHeight = 672.dp, background = KoolBackground) {
+        // ── Header ────────────────────────────────────────────────
+        Art(R.drawable.discover_logo, 104f, 40f, 77f, 35f)
+        Art(R.drawable.discover_pin, 11f, 44f, 16f, 22f)
+        Label("طرابلس", 29f, 43f, 41f, 20f, 10f, KoolTextPrimary, FontWeight.Bold)
+        Art(R.drawable.discover_chevron, 72f, 49f, 11f, 10f)
+        Art(R.drawable.discover_bell, 257f, 42f, 23f, 25f)
 
-        var selectedTab by remember { mutableIntStateOf(0) }
-        val navItems = listOf("الرئيسية", "اكتشف", "الطلبات", "المفضلة", "حسابي")
-        val navIcons = listOf(
-            Icons.Default.Home,
-            Icons.Default.Search,
-            Icons.Default.ShoppingBag,
-            Icons.Default.FavoriteBorder,
-            Icons.Default.Person,
-        )
+        // ── Search field ──────────────────────────────────────────
+        Slab(10f, 82f, 274f, 35f, KoolSearchBg, 12f)
+        Art(R.drawable.discover_search, 24f, 90f, 18f, 18f)
+        Label("ابحث عن مطعم أو أطباق ...", 66f, 89f, 178f, 21f, 9f, KoolTextSecondary)
+        Art(R.drawable.discover_filter, 252f, 90f, 19f, 18f)
 
-        Scaffold(
-            containerColor = KoolBackground,
-            bottomBar = {
-                NavigationBar(
-                    containerColor = KoolBottomNavBg,
-                    modifier = Modifier.height(64.dp),
-                ) {
-                    navItems.forEachIndexed { i, label ->
-                        NavigationBarItem(
-                            selected = selectedTab == i,
-                            onClick = { selectedTab = i },
-                            icon = {
-                                Icon(
-                                    imageVector = navIcons[i],
-                                    contentDescription = label,
-                                    modifier = Modifier.size(21.dp),
-                                )
-                            },
-                            label = {
-                                Text(label, fontSize = 8.sp)
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = KoolBottomNavActive,
-                                selectedTextColor = KoolBottomNavActive,
-                                unselectedIconColor = KoolBottomNavInactive,
-                                unselectedTextColor = KoolBottomNavInactive,
-                                indicatorColor = Color.Transparent,
-                            ),
-                        )
-                    }
-                }
-            },
-        ) { innerPadding ->
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(bottom = 16.dp),
-            ) {
-                // Top bar
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(Icons.Default.LocationOn, null, tint = KoolPink, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(2.dp))
-                        Text("طرابلس", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary)
-                        Icon(Icons.Default.KeyboardArrowDown, null, tint = KoolTextPrimary, modifier = Modifier.size(11.dp))
-                        Spacer(Modifier.weight(1f))
-                        Text("KOOL", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = KoolPink)
-                        Spacer(Modifier.weight(1f))
-                        Icon(Icons.Default.Notifications, "إشعارات", tint = KoolTextPrimary, modifier = Modifier.size(23.dp))
-                    }
-                }
+        // ── Category tiles ────────────────────────────────────────
+        Art(R.drawable.discover_tile_burger, 10f, 128f, 48f, 47f, cornerRadius = 12f)
+        Art(R.drawable.discover_tile_pizza, 66f, 128f, 48f, 47f, cornerRadius = 12f)
+        Art(R.drawable.discover_tile_chicken, 122f, 128f, 48f, 47f, cornerRadius = 12f)
+        Art(R.drawable.discover_tile_seafood, 178f, 128f, 48f, 47f, cornerRadius = 12f)
+        Art(R.drawable.discover_tile_more, 234f, 128f, 48f, 47f, cornerRadius = 12f)
+        Label("برجر", 7f, 176f, 54f, 17f, 9f, KoolTextPrimary)
+        Label("بيتزا", 63f, 176f, 54f, 17f, 9f, KoolTextPrimary)
+        Label("دجاج", 119f, 176f, 54f, 17f, 9f, KoolTextPrimary)
+        Label("مأكولات بحرية", 175f, 176f, 54f, 17f, 9f, KoolTextPrimary)
+        Label("المزيد", 231f, 176f, 54f, 17f, 9f, KoolTextPrimary)
 
-                // Search bar
-                item {
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(35.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(KoolSearchBg),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Spacer(Modifier.width(10.dp))
-                        Icon(Icons.Default.Search, null, tint = KoolTextSecondary, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("ابحث عن مطعم أو أطباق ...", color = KoolTextSecondary, fontSize = 10.sp, modifier = Modifier.weight(1f))
-                        Icon(Icons.Default.Tune, "فلتر", tint = KoolTextSecondary, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(10.dp))
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
+        // ── Promo banner (artwork + copy are part of the design asset) ──
+        Art(R.drawable.discover_banner, 10f, 205f, 272f, 135f, cornerRadius = 16f)
+        repeat(5) { i ->
+            Slab(
+                128f + i * 9f,
+                344f,
+                5f,
+                5f,
+                if (i == 0) KoolPink else Color(0xFFD8D4CE),
+                2.5f,
+            )
+        }
 
-                // Category chips
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        itemsIndexed(categories) { _, cat ->
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(48.dp, 47.dp)
-                                        .clip(RoundedCornerShape(13.dp))
-                                        .background(
-                                            if (cat.isActive)
-                                                Brush.horizontalGradient(listOf(KoolCategoryGradientStart, KoolCategoryGradientEnd))
-                                            else Brush.linearGradient(listOf(Color.White, Color.White))
-                                        ),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(29.dp)
-                                            .clip(CircleShape)
-                                            .background(
-                                                if (cat.isActive) Color.White.copy(alpha = 0.3f)
-                                                else KoolPink.copy(alpha = 0.1f)
-                                            )
-                                    )
-                                }
-                                Spacer(Modifier.height(4.dp))
-                                Text(cat.label, fontSize = 8.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary, textAlign = TextAlign.Center)
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                // Promo banner
-                item {
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxWidth()
-                            .height(135.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Brush.horizontalGradient(listOf(Color(0xFF2D1B6B), Color(0xFF6B2D6B)))),
-                        contentAlignment = Alignment.CenterEnd,
-                    ) {
-                        Column(modifier = Modifier.padding(end = 16.dp), horizontalAlignment = Alignment.End) {
-                            Text("بيتزا", fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
-                            Text("كما تحبها", fontSize = 14.sp, color = Color.White)
-                            Spacer(Modifier.height(8.dp))
-                            Box(
-                                modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(KoolPink).padding(horizontal = 12.dp, vertical = 4.dp),
-                            ) {
-                                Text("اطلب الآن ←", fontSize = 10.sp, color = Color.White)
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                // Nearby restaurants section header
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("عرض الكل ←", fontSize = 10.sp, color = KoolPinkAccent)
-                        Text("أهم المطاعم بالقرب منك", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = KoolTextPrimary)
-                    }
-                    Spacer(Modifier.height(10.dp))
-                }
-
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        items(apiRestaurants) { restaurant ->
-                            RestaurantCard(
-                                restaurant = restaurant,
-                                onClick = { onRestaurantClick(restaurant.id ?: "") },
-                            )
-                        }
-                        // Show placeholder cards while loading
-                        if (apiRestaurants.isEmpty()) {
-                            items(3) {
-                                RestaurantCard(restaurant = null, onClick = {})
-                            }
-                        }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                }
-
-                // Top rated section header
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text("عرض الكل", fontSize = 10.sp, color = KoolPinkAccent)
-                        Text("الأكثر تقييماً", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = KoolTextPrimary)
-                    }
-                    Spacer(Modifier.height(10.dp))
-                }
-
-                // Top rated meal images — using real restaurant photos as preview
-                item {
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        val topRated = apiRestaurants.take(3)
-                        items(topRated) { r ->
-                            AsyncImage(
-                                model = r.imageUrl,
-                                contentDescription = r.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(86.dp, 71.dp)
-                                    .clip(RoundedCornerShape(9.dp))
-                                    .background(KoolSurfaceVariant),
-                            )
-                        }
-                        if (topRated.isEmpty()) {
-                            val fallbackColors = listOf(
-                                listOf(Color(0xFFB05E3A), Color(0xFF7A3A1A)),
-                                listOf(Color(0xFF3A6BB0), Color(0xFF1A4A7A)),
-                                listOf(Color(0xFF6BB03A), Color(0xFF3A7A1A)),
-                            )
-                            items(3) { i ->
-                                Box(
-                                    modifier = Modifier
-                                        .size(86.dp, 71.dp)
-                                        .clip(RoundedCornerShape(9.dp))
-                                        .background(Brush.verticalGradient(fallbackColors[i])),
-                                )
-                            }
-                        }
-                    }
-                }
+        // ── Nearby restaurants ────────────────────────────────────
+        Label("أهم المطاعم بالقرب منك", 94f, 355f, 188f, 25f, 14f, KoolTextPrimary, FontWeight.ExtraBold, TextAlign.End)
+        Label("عرض الكل", 9f, 357f, 58f, 21f, 10f, KoolPink)
+        LazyRow(
+            modifier = Modifier.at(10f, 387f, 276f, 133f),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            items(restaurants) { restaurant ->
+                RestaurantCard(restaurant) { onRestaurantClick(restaurant.id ?: "") }
             }
         }
+
+        // ── Top rated ─────────────────────────────────────────────
+        Label("الأكثر تقييماً", 164f, 527f, 118f, 26f, 14f, KoolTextPrimary, FontWeight.ExtraBold, TextAlign.End)
+        Label("عرض الكل", 9f, 532f, 58f, 20f, 10f, KoolPink)
+        LazyRow(
+            modifier = Modifier.at(10f, 557f, 276f, 71f),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+        ) {
+            items(restaurants.take(12)) { restaurant ->
+                Photo(
+                    model = restaurant.imageUrl,
+                    modifier = Modifier.width(86.dp).height(71.dp),
+                    radius = 9f,
+                )
+            }
+        }
+
+        // ── Bottom navigation ─────────────────────────────────────
+        Slab(0f, 608f, 295f, 64f, Color.White)
+        Slab(0f, 608f, 295f, 0.5f, Color(0xFFEFECE6))
+        Art(R.drawable.discover_nav_home, 19f, 615f, 27f, 21f)
+        Art(R.drawable.discover_nav_discover, 77f, 615f, 24f, 21f)
+        Art(R.drawable.discover_nav_orders, 135f, 615f, 21f, 21f)
+        Art(R.drawable.discover_nav_fav, 193f, 615f, 22f, 21f)
+        Art(R.drawable.discover_nav_account, 251f, 615f, 20f, 21f)
+        Label("الرئيسية", 9f, 637f, 53f, 17f, 8f, KoolPink)
+        Label("اكتشف", 67f, 637f, 53f, 17f, 8f, KoolTextSecondary)
+        Label("الطلبات", 125f, 637f, 53f, 17f, 8f, KoolTextSecondary)
+        Label("المفضلة", 183f, 637f, 53f, 17f, 8f, KoolTextSecondary)
+        Label("حسابي", 241f, 637f, 53f, 17f, 8f, KoolTextSecondary)
     }
 }
 
 @Composable
-private fun RestaurantCard(
-    restaurant: RestaurantData?,
-    onClick: () -> Unit,
-) {
-    Card(
-        modifier = Modifier.width(86.dp).height(133.dp).clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+private fun RestaurantCard(restaurant: RestaurantData, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .width(86.dp)
+            .height(133.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.White)
+            .clickable { onClick() },
+        contentAlignment = BiasAlignment(-1f, -1f),
     ) {
-        Column {
-            if (restaurant?.imageUrl != null) {
-                AsyncImage(
-                    model = restaurant.imageUrl,
-                    contentDescription = restaurant.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(58.dp)
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(58.dp)
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .background(Color(0xFFE0D8D0)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        restaurant?.name?.take(1) ?: "·",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = KoolTextPrimary,
-                    )
-                }
-            }
-            Column(modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)) {
-                Text(restaurant?.name ?: "...", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary, maxLines = 1)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Star, null, tint = KoolRatingStarColor, modifier = Modifier.size(10.dp))
-                    Spacer(Modifier.width(2.dp))
-                    Text("${restaurant?.rating ?: "--"} (${restaurant?.reviewCount ?: "--"})", fontSize = 8.sp, color = KoolTextSecondary)
-                }
-                Text(restaurant?.deliveryTime ?: "...", fontSize = 8.sp, color = KoolTextSecondary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-                Text(
-                    restaurant?.deliveryFee ?: "--",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (restaurant?.deliveryFee == "مجانا") KoolDeliveryFreeColor else KoolTextPrimary,
-                )
-            }
+        Photo(restaurant.imageUrl, Modifier.at(0f, 0f, 86f, 58f), radius = 8f)
+        Label(restaurant.name ?: "", 4f, 62f, 82f, 14f, 8f, KoolTextPrimary, FontWeight.Bold)
+        Art(R.drawable.discover_star, 5f, 81f, 10f, 10f)
+        Label(restaurant.rating ?: "--", 17f, 79f, 66f, 14f, 8f, KoolTextSecondary)
+        restaurant.deliveryTime?.let {
+            Label(it, 3f, 96f, 80f, 14f, 8f, KoolTextSecondary)
+        }
+        restaurant.deliveryFee?.let {
+            Label(it, 4f, 112f, 78f, 15f, 9f, KoolTextPrimary, FontWeight.Bold)
         }
     }
 }

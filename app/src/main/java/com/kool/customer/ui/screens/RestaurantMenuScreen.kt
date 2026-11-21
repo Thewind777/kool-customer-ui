@@ -2,278 +2,160 @@ package com.kool.customer.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import com.kool.customer.R
 import com.kool.customer.data.model.MenuItemData
-import com.kool.customer.ui.theme.*
+import com.kool.customer.ui.theme.Art
+import com.kool.customer.ui.theme.DesignCanvas
+import com.kool.customer.ui.theme.KoolBackground
+import com.kool.customer.ui.theme.KoolInfoChipBg
+import com.kool.customer.ui.theme.KoolPink
+import com.kool.customer.ui.theme.KoolSurfaceVariant
+import com.kool.customer.ui.theme.KoolTextPrimary
+import com.kool.customer.ui.theme.KoolTextSecondary
+import com.kool.customer.ui.theme.Label
+import com.kool.customer.ui.theme.Photo
+import com.kool.customer.ui.theme.Slab
+import com.kool.customer.ui.theme.at
 import com.kool.customer.ui.viewmodel.RestaurantViewModel
 
-// Screen 03 · Restaurant Menu
+// Screen 03 · Restaurant menu — Figma frame 2:8 (294 × 672).
+// Hero, logo, names and prices are live; the rest is the design verbatim.
 @Composable
 fun RestaurantMenuScreen(
-    restaurantId: Int = 1,
+    restaurantId: Int,
     onBack: () -> Unit = {},
-    onMealClick: (String) -> Unit = {},
+    onMealClick: (MenuItemData) -> Unit = {},
     vm: RestaurantViewModel = viewModel(factory = RestaurantViewModel.Factory(restaurantId)),
 ) {
     val details by vm.details.collectAsStateWithLifecycle()
     val info = details?.companyInfo
-    val menuItems = details?.menuItems ?: emptyList()
+    val meals = details?.menuItems ?: emptyList()
 
-    val filterChips = listOf("مشروبات", "وجبات", "سندويشات", "برجر", "الكل")
-    var selectedFilter by remember { mutableIntStateOf(4) }
-    var selectedTab by remember { mutableIntStateOf(0) }
-    val tabs = listOf("القائمة", "التقييمات", "معلومات")
+    DesignCanvas(designWidth = 294.dp, designHeight = 672.dp, background = KoolBackground) {
+        // ── Hero ──────────────────────────────────────────────────
+        Slab(0f, 0f, 294f, 202f, Color(0xFF2B2B2B))
+        Photo(info?.imageUrl, Modifier.at(0f, 0f, 294f, 202f))
+        Slab(9f, 39f, 32f, 32f, Color.Black.copy(alpha = 0.18f), 16f)
+        Slab(214f, 39f, 32f, 32f, Color.Black.copy(alpha = 0.18f), 16f)
+        Slab(250f, 39f, 32f, 32f, Color.Black.copy(alpha = 0.18f), 16f)
+        Art(R.drawable.menu_ic_back, 13f, 43f, 24f, 27f)
+        Box(Modifier.at(6f, 36f, 38f, 41f).clickable { onBack() })
+        Art(R.drawable.menu_ic_fav, 218f, 43f, 25f, 25f)
+        Art(R.drawable.menu_ic_share, 254f, 43f, 25f, 25f)
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Box(modifier = Modifier.fillMaxSize().background(KoolBackground)) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                // Hero photo
-                item {
-                    Box(modifier = Modifier.fillMaxWidth().height(202.dp)) {
-                        if (info?.imageUrl != null) {
-                            AsyncImage(
-                                model = info.imageUrl,
-                                contentDescription = info.name,
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        } else {
-                            Box(
-                                modifier = Modifier.fillMaxSize().background(
-                                    Brush.verticalGradient(listOf(Color(0xFF8B4513), Color(0xFF5C2D0A)))
-                                ),
-                            )
-                        }
-                        // Controls overlay
-                        Row(
-                            modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 16.dp, vertical = 8.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Box(
-                                modifier = Modifier.size(33.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f)).clickable { onBack() },
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(Icons.Default.ArrowBack, "رجوع", tint = KoolTextPrimary, modifier = Modifier.size(18.dp))
-                            }
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Box(modifier = Modifier.size(25.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f)), contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Default.FavoriteBorder, null, tint = KoolTextPrimary, modifier = Modifier.size(16.dp))
-                                }
-                                Box(modifier = Modifier.size(25.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.9f)), contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Default.Share, null, tint = KoolTextPrimary, modifier = Modifier.size(16.dp))
-                                }
-                            }
-                        }
-                    }
-                }
+        // ── Info surface ──────────────────────────────────────────
+        Slab(0f, 186f, 294f, 486f, Color.White, 23f)
+        Photo(info?.logoUrl, Modifier.at(12f, 199f, 78f, 73f), radius = 15f)
+        Label(
+            text = info?.name ?: "Kazan",
+            x = 100f, y = 208f, w = 165f, h = 28f,
+            size = 16f, color = KoolTextPrimary, weight = FontWeight.Bold, align = TextAlign.End,
+        )
+        Label("برجر · ساندويشات · دجاج · سمك", 108f, 232f, 172f, 19f, 9f, KoolTextSecondary, align = TextAlign.End)
+        Art(R.drawable.menu_star, 106f, 255f, 15f, 15f)
+        Label(info?.rating ?: "4.8", 126f, 253f, 25f, 18f, 13f, KoolTextPrimary, FontWeight.Bold)
+        Label("(1.2K) تقييم", 153f, 254f, 103f, 18f, 10f, KoolTextSecondary, align = TextAlign.Start)
 
-                // Restaurant info card
-                item {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth().offset(y = (-16).dp),
-                        shape = RoundedCornerShape(topStart = 23.dp, topEnd = 23.dp),
-                        color = KoolSurface,
-                    ) {
-                        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
-                            Spacer(Modifier.height(12.dp))
-                            Row(verticalAlignment = Alignment.Top) {
-                                // Restaurant logo
-                                if (info?.logoUrl != null) {
-                                    AsyncImage(
-                                        model = info.logoUrl,
-                                        contentDescription = info.name,
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier.size(78.dp, 73.dp).clip(RoundedCornerShape(15.dp)),
-                                    )
-                                } else {
-                                    Box(
-                                        modifier = Modifier.size(78.dp, 73.dp).clip(RoundedCornerShape(15.dp)).background(Color(0xFF1A1A1A)),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text("K", fontSize = 32.sp, fontWeight = FontWeight.ExtraBold, color = KoolPink)
-                                    }
-                                }
-                                Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text(info?.name ?: "Kazan", fontSize = 21.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary)
-                                    Text("برجر · سندويشات · وجبات سريعة", fontSize = 9.sp, color = KoolTextSecondary)
-                                    Spacer(Modifier.height(4.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.Star, null, tint = KoolRatingStarColor, modifier = Modifier.size(15.dp))
-                                        Spacer(Modifier.width(4.dp))
-                                        Text("4.8", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary)
-                                        Spacer(Modifier.width(4.dp))
-                                        Text("(1.2K) تقييم", fontSize = 10.sp, color = KoolTextSecondary)
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.height(10.dp))
+        // ── Delivery chips ────────────────────────────────────────
+        Slab(11f, 286f, 93f, 39f, KoolInfoChipBg, 10f)
+        Art(R.drawable.menu_clock, 16f, 292f, 17f, 17f)
+        Label("35 - 20 دقيقة", 36f, 290f, 66f, 17f, 9f, KoolTextPrimary, FontWeight.Bold)
 
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                DeliveryInfoChip(icon = { Icon(Icons.Default.AccessTime, null, Modifier.size(17.dp)) }, label = "20 - 35 دقيقة")
-                                DeliveryInfoChip(icon = { Icon(Icons.Default.LocationOn, null, Modifier.size(17.dp)) }, label = "2.5 كم")
-                                DeliveryInfoChip(icon = { Icon(Icons.Default.DeliveryDining, null, Modifier.size(19.dp)) }, label = "مجانا", caption = "رسوم التوصيل")
-                            }
-                            Spacer(Modifier.height(12.dp))
+        Slab(111f, 286f, 70f, 39f, KoolInfoChipBg, 10f)
+        Art(R.drawable.menu_pin, 116f, 292f, 17f, 17f)
+        Label("2.5 كم", 136f, 290f, 43f, 17f, 9f, KoolTextPrimary, FontWeight.Bold)
 
-                            // Tab row
-                            Box(modifier = Modifier.fillMaxWidth().height(29.dp).clip(RoundedCornerShape(14.dp)).background(KoolSurfaceVariant)) {
-                                Row(modifier = Modifier.fillMaxSize()) {
-                                    tabs.forEachIndexed { i, tab ->
-                                        Box(
-                                            modifier = Modifier.weight(1f).fillMaxHeight().clickable { selectedTab = i },
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            Text(tab, fontSize = 10.sp, fontWeight = if (selectedTab == i) FontWeight.Bold else FontWeight.Normal, color = if (selectedTab == i) KoolTextPrimary else KoolTextSecondary)
-                                        }
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.height(4.dp))
-                            Box(modifier = Modifier.fillMaxWidth(1f / 3f).height(2.dp).padding(horizontal = 8.dp).clip(RoundedCornerShape(1.dp)).background(KoolTabIndicator))
-                            Spacer(Modifier.height(10.dp))
+        Slab(191f, 286f, 91f, 39f, KoolInfoChipBg, 10f)
+        Art(R.drawable.menu_scooter, 196f, 292f, 19f, 17f)
+        Label("مجانا", 216f, 290f, 64f, 17f, 9f, KoolTextPrimary, FontWeight.Bold)
+        Label("رسوم التوصيل", 206f, 305f, 73f, 14f, 8f, KoolTextSecondary)
 
-                            // Filter chips
-                            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                items(filterChips.size) { i ->
-                                    Box(
-                                        modifier = Modifier.height(27.dp).clip(RoundedCornerShape(11.dp)).background(if (selectedFilter == i) KoolAddButton else KoolChipBg).clickable { selectedFilter = i }.padding(horizontal = 10.dp),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text(filterChips[i], fontSize = 9.sp, color = if (selectedFilter == i) Color.White else KoolTextSecondary)
-                                    }
-                                }
-                            }
-                            Spacer(Modifier.height(10.dp))
+        // ── Tabs ──────────────────────────────────────────────────
+        Slab(10f, 330f, 274f, 29f, KoolSurfaceVariant, 14f)
+        Label("القائمة", 15f, 332f, 78f, 23f, 10f, KoolTextPrimary, FontWeight.Bold)
+        Label("التقييمات", 106f, 332f, 78f, 23f, 10f, KoolTextSecondary)
+        Label("معلومات", 197f, 332f, 78f, 23f, 10f, KoolTextSecondary)
+        Slab(20f, 358f, 67f, 2f, KoolPink, 1f)
 
-                            Text("برجر", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = KoolTextPrimary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
-                            Spacer(Modifier.height(8.dp))
-                        }
-                    }
-                }
+        // ── Filter chips (last one is the selected state in the design) ──
+        FilterChip("مشروبات", 10f, 50f)
+        FilterChip("وجبات", 68f, 43f)
+        FilterChip("سندويشات", 119f, 65f)
+        FilterChip("برجر", 192f, 43f)
+        FilterChip("الكل", 242f, 41f, active = true)
 
-                // Menu items from API (or static fallback)
-                if (menuItems.isNotEmpty()) {
-                    items(menuItems) { item ->
-                        MealCard(
-                            item = item,
-                            onAdd = { onMealClick(item.id ?: "") },
-                            modifier = Modifier.padding(horizontal = 12.dp).padding(bottom = 8.dp),
-                        )
-                    }
-                } else {
-                    // Static fallback while loading
-                    items(3) { i ->
-                        val names = listOf("كلاسيك برجر", "دبل كازان", "سبايسي كازان")
-                        val descs = listOf("لحم بقري 20%، جبنة شيدر، خس طماطم، صوص خاص", "شريحتان لحم، جبنة مضاعفة وصوص كازان الخاص", "لحم بقري حار، هالبينو، خس طماطم، صوص حار خاص")
-                        val prices = listOf("28", "35", "32")
-                        MealCard(
-                            item = MenuItemData(id = "$i", name = names[i], description = descs[i], price = prices[i], mostOrdered = if (i == 0) "1" else "0"),
-                            onAdd = { onMealClick("$i") },
-                            modifier = Modifier.padding(horizontal = 12.dp).padding(bottom = 8.dp),
-                        )
-                    }
-                }
+        // ── Section heading ───────────────────────────────────────
+        Label("برجر", 220f, 402f, 62f, 23f, 14f, KoolTextPrimary, FontWeight.ExtraBold, TextAlign.End)
 
-                item { Spacer(Modifier.height(24.dp)) }
+        // ── Meals (live) ──────────────────────────────────────────
+        LazyColumn(
+            modifier = Modifier.at(10f, 415f, 274f, 250f),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(meals) { meal ->
+                MealCard(meal) { onMealClick(meal) }
             }
         }
     }
 }
 
 @Composable
-private fun DeliveryInfoChip(icon: @Composable () -> Unit, label: String, caption: String? = null) {
-    Box(
-        modifier = Modifier.height(39.dp).clip(RoundedCornerShape(10.dp)).background(KoolInfoChipBg).padding(horizontal = 6.dp),
-        contentAlignment = Alignment.Center,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) { icon() }
-            Spacer(Modifier.width(4.dp))
-            Column {
-                Text(label, fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF344751))
-                if (caption != null) Text(caption, fontSize = 8.sp, color = KoolTextSecondary)
-            }
-        }
-    }
+private fun BoxScope.FilterChip(
+    label: String,
+    x: Float,
+    w: Float,
+    active: Boolean = false,
+) {
+    Slab(x, 370f, w, 27f, if (active) KoolPink else KoolSurfaceVariant, 11f)
+    Label(label, x, 373f, w, 20f, 9f, if (active) Color.White else KoolTextSecondary)
 }
 
 @Composable
-private fun MealCard(item: MenuItemData, onAdd: () -> Unit, modifier: Modifier = Modifier) {
+private fun MealCard(meal: MenuItemData, onAdd: () -> Unit) {
     Box(
-        modifier = modifier.fillMaxWidth().heightIn(min = 77.dp).clip(RoundedCornerShape(12.dp)).background(Color.White),
+        Modifier
+            .width(274.dp)
+            .height(86.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White),
+        contentAlignment = BiasAlignment(-1f, -1f),
     ) {
-        Row(modifier = Modifier.padding(0.dp)) {
-            if (item.imageUrl != null) {
-                AsyncImage(
-                    model = item.imageUrl,
-                    contentDescription = item.name,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(81.dp, if (item.mostOrdered == "1") 84.dp else 77.dp)
-                        .clip(RoundedCornerShape(10.dp)),
-                )
-            } else {
-                Box(
-                    modifier = Modifier
-                        .size(81.dp, if (item.mostOrdered == "1") 84.dp else 77.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Brush.verticalGradient(listOf(Color(0xFFB05E3A), Color(0xFF7A3A1A)))),
-                )
-            }
-            Column(modifier = Modifier.weight(1f).padding(start = 8.dp, top = 6.dp, end = 8.dp, bottom = 6.dp)) {
-                if (item.mostOrdered == "1") {
-                    Box(
-                        modifier = Modifier.height(17.dp).clip(RoundedCornerShape(7.dp)).background(KoolMostOrderedBadge).padding(horizontal = 6.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("الأكثر طلباً", fontSize = 8.sp, color = Color.White)
-                    }
-                    Spacer(Modifier.height(2.dp))
-                }
-                Text(item.name ?: "", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color(0xFF192A30))
-                Text(item.description ?: "", fontSize = 8.sp, color = KoolTextTertiary, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Spacer(Modifier.height(4.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("ل.د", fontSize = 10.sp, color = KoolTextPrimary)
-                        Spacer(Modifier.width(2.dp))
-                        Text(item.price ?: "--", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = KoolTextPrimary)
-                    }
-                    Box(
-                        modifier = Modifier.size(25.dp).clip(RoundedCornerShape(13.dp)).background(KoolAddButton).clickable { onAdd() },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text("+", fontSize = 18.sp, color = Color.White, fontWeight = FontWeight.Normal, lineHeight = 20.sp)
-                    }
-                }
-            }
+        Photo(meal.imageUrl, Modifier.at(0f, 0f, 81f, 84f), radius = 10f)
+
+        if (meal.mostOrdered == "1") {
+            Slab(81f, 6f, 60f, 17f, Color(0xFFF84C8A), 7f)
+            Label("الأكثر طلباً", 81f, 6f, 60f, 17f, 8f, Color.White)
         }
+
+        Label(meal.name ?: "", 88f, 25f, 144f, 20f, 11f, KoolTextPrimary, FontWeight.Bold, align = TextAlign.End)
+        Label(
+            text = meal.description ?: "",
+            x = 89f, y = 44f, w = 143f, h = 29f,
+            size = 8f, color = KoolTextSecondary, align = TextAlign.End, maxLines = 2,
+        )
+        Label(meal.price ?: "--", 100f, 68f, 46f, 18f, 12f, KoolTextPrimary, FontWeight.Bold, align = TextAlign.End)
+        Label("ل.د", 95f, 70f, 20f, 15f, 9f, KoolTextSecondary)
+        Art(R.drawable.menu_plus, 244f, 58f, 25f, 25f)
+        Box(Modifier.at(244f, 58f, 25f, 25f).clip(RoundedCornerShape(13.dp)).clickable { onAdd() })
     }
 }

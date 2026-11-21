@@ -5,10 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kool.customer.data.model.MenuItemData
 import com.kool.customer.ui.screens.*
 import com.kool.customer.ui.theme.KoolTheme
 
@@ -19,6 +24,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoolTheme {
                 val navController = rememberNavController()
+                var selectedMeal by remember { mutableStateOf<MenuItemData?>(null) }
                 NavHost(
                     navController = navController,
                     startDestination = "welcome",
@@ -42,8 +48,9 @@ class MainActivity : ComponentActivity() {
                         RestaurantMenuScreen(
                             restaurantId = id,
                             onBack = { navController.popBackStack() },
-                            onMealClick = { mealId ->
-                                navController.navigate("item/$mealId")
+                            onMealClick = { meal ->
+                                selectedMeal = meal
+                                navController.navigate("item/${meal.id ?: "0"}")
                             },
                         )
                     }
@@ -51,6 +58,7 @@ class MainActivity : ComponentActivity() {
                         ItemDetailScreen(
                             onBack = { navController.popBackStack() },
                             onAddToCart = { navController.popBackStack() },
+                            meal = selectedMeal,
                         )
                     }
                 }
