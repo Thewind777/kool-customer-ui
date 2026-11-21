@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        The Figma frames include their own status-bar strip and bleed to the
+        screen edge, so the window must extend under the display cutout and the
+        system bars. Without shortEdges the window is laid out below the cutout
+        and the whole design gets scaled into a smaller box.
+    -->
+    <style name="Theme.Kool" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+        <item name="android:windowBackground">@color/kool_window_bg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    </style>
+</resources>
