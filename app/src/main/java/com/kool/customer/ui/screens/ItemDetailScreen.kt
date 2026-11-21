@@ -65,9 +65,13 @@ fun ItemDetailScreen(
         } else {
             Art(R.drawable.item_hero, 0f, 0f, 291f, 272f)
         }
-        Art(R.drawable.item_back, 12f, 39f, 33f, 34f)
-        Box(Modifier.at(12f, 39f, 33f, 34f).clip(RoundedCornerShape(17.dp)).clickable { onBack() })
-        Art(R.drawable.item_fav, 223f, 39f, 34f, 34f)
+        // Controls drawn the same way as the restaurant page: shape in Compose,
+        // glyph as an alpha mask, so nothing from the hero photo is baked in.
+        Slab(12f, 39f, 33f, 34f, Color.White, 14f)
+        Art(R.drawable.item_ic_back, 12f, 39f, 33f, 34f)
+        Box(Modifier.at(12f, 39f, 33f, 34f).clip(RoundedCornerShape(14.dp)).clickable { onBack() })
+        Slab(247f, 39f, 34f, 34f, Color.White, 14f)
+        Art(R.drawable.item_ic_fav, 247f, 39f, 34f, 34f)
 
         // ── Detail surface ────────────────────────────────────────
         Slab(0f, 260f, 291f, 412f, Color.White, 23f)

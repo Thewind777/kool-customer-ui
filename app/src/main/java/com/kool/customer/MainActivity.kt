@@ -24,10 +24,17 @@ class MainActivity : ComponentActivity() {
         setContent {
             KoolTheme {
                 val navController = rememberNavController()
+                // Debug-only: lets a QA build open a screen directly, e.g.
+                //   adb shell am start -n com.kool.customer/.MainActivity --es start item/0
+                val startRoute = if (BuildConfig.DEBUG) {
+                    intent?.getStringExtra("start") ?: "welcome"
+                } else {
+                    "welcome"
+                }
                 var selectedMeal by remember { mutableStateOf<MenuItemData?>(null) }
                 NavHost(
                     navController = navController,
-                    startDestination = "welcome",
+                    startDestination = startRoute,
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     composable("welcome") {
